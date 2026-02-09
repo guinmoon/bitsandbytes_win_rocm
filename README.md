@@ -165,6 +165,50 @@ bitsandbytes has the following minimum requirements for all platforms:
   </tbody>
 </table>
 
+## Build `bitsandbytes` for AMD GPUs with ROCm on Windows (TheRock)
+
+### Installation Guide - PowerShell
+
+Run the following commands in your PowerShell terminal to set up the environment variables for the Clang compiler and ROCm SDK, then build and install the package from source.
+
+### 1. Clone this fork
+
+```powershell
+git clone https://github.com/0xDELUXA/bitsandbytes_win_rocm
+```
+
+### 2. Set Environment Variables
+
+Modify the paths below to match your virtual environment and ROCm SDK directories. Also, replace `gfx1200` with your GPU’s architecture.
+
+```powershell
+venv/scripts/activate
+rocm-sdk init
+$env:CMAKE_GENERATOR = "Ninja"
+$env:BNB_ROCM_ARCH = "gfx1200"
+$env:COMPUTE_BACKEND = "hip"
+$env:HIP_PLATFORM = "amd"
+$env:HIP_PATH = ".../venv/Lib/site-packages/_rocm_sdk_devel"
+$env:ROCM_PATH = $env:HIP_PATH
+$env:PATH = "...\venv\Lib\site-packages\_rocm_sdk_devel\bin;...\venv\Lib\site-packages\_rocm_sdk_devel\lib\llvm\bin;$env:PATH"
+$env:CC = ".../venv/Lib/site-packages/_rocm_sdk_devel/lib/llvm/bin/clang.exe"
+$env:CXX = ".../venv/Lib/site-packages/_rocm_sdk_devel/lib/llvm/bin/clang++.exe"
+$env:CMAKE_ARGS = "-DCOMPUTE_BACKEND=hip -DBNB_ROCM_ARCH=gfx1200 -DHIP_PLATFORM=amd -DCMAKE_C_COMPILER=.../venv/Lib/site-packages/_rocm_sdk_devel/lib/llvm/bin/clang.exe -DCMAKE_CXX_COMPILER=.../venv/Lib/site-packages/_rocm_sdk_devel/lib/llvm/bin/clang++.exe -DCMAKE_HIP_COMPILER=.../venv/Lib/site-packages/_rocm_sdk_devel/lib/llvm/bin/clang++.exe -DCMAKE_HIP_FLAGS=`"--rocm-path=.../venv/Lib/site-packages/_rocm_sdk_devel --rocm-device-lib-path=.../venv/Lib/site-packages/_rocm_sdk_core/lib/llvm/amdgcn/bitcode`" -DCMAKE_SHARED_LINKER_FLAGS=`".../venv/Lib/site-packages/_rocm_sdk_devel/lib/amdhip64.lib .../venv/Lib/site-packages/_rocm_sdk_devel/lib/rocblas.lib`""
+```
+
+### 3. Build from Source
+
+```powershell
+pip wheel . --no-build-isolation --no-deps -w dist -v
+```
+
+### 4. Install the built wheel
+
+```powershell
+# Note: Future versions may have a different wheel names. Update the command below accordingly.
+pip install dist/bitsandbytes-0.49.2.dev0-cp312-cp312-win_amd64.whl --no-deps
+```
+
 ## :book: Documentation
 * [Official Documentation](https://huggingface.co/docs/bitsandbytes/main)
 * 🤗 [Transformers](https://huggingface.co/docs/transformers/quantization/bitsandbytes)
